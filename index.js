@@ -42,12 +42,35 @@ const pizzas = [
   },
 ];
 
-const form = document.getElementById('pizzaForm');
-const resultContainer = document.getElementById('resultContainer');
+const form = document.getElementById("pizzaForm");
+const resultContainer = document.getElementById("resultContainer");
 
-form.addEventListener('submit', function(event) {
+function findPizzaById(id) {
+  return pizzas.find((pizza) => pizza.id === id);
+}
+
+function renderPizzaCard(pizza) {
+  const cardHTML = `
+    <div class="card">
+      <h2>${pizza.nombre}</h2>
+      <img src="${pizza.imagen}" alt="${pizza.nombre}">
+      <p>Ingredientes: ${pizza.ingredientes.join(", ")}</p>
+      <span class="price">$${pizza.precio}</span>
+    </div>
+  `;
+  resultContainer.innerHTML = cardHTML;
+
+  localStorage.setItem("lastPizza", JSON.stringify(pizza));
+}
+
+function renderError(message) {
+  const errorHTML = `<p class="error">${message}</p>`;
+  resultContainer.innerHTML = errorHTML;
+}
+
+form.addEventListener("submit", function (event) {
   event.preventDefault();
-  const pizzaId = parseInt(document.getElementById('pizzaId').value);
+  const pizzaId = parseInt(document.getElementById("pizzaId").value);
 
   if (!isNaN(pizzaId)) {
     const pizza = findPizzaById(pizzaId);
@@ -61,23 +84,13 @@ form.addEventListener('submit', function(event) {
   }
 });
 
-function findPizzaById(id) {
-  return pizzas.find(pizza => pizza.id === id);
+function initPage() {
+  const lastPizzaData = localStorage.getItem("lastPizza");
+
+  if (lastPizzaData) {
+    const lastPizza = JSON.parse(lastPizzaData);
+    renderPizzaCard(lastPizza);
+  }
 }
 
-function renderPizzaCard(pizza) {
-  const cardHTML = `
-    <div class="card">
-      <h2>${pizza.nombre}</h2>
-      <img src="${pizza.imagen}" alt="${pizza.nombre}">
-      <p>Ingredientes: ${pizza.ingredientes.join(', ')}</p>
-      <span class="price">$${pizza.precio}</span>
-    </div>
-  `;
-  resultContainer.innerHTML = cardHTML;
-}
-
-function renderError(message) {
-  const errorHTML = `<p class="error">${message}</p>`;
-  resultContainer.innerHTML = errorHTML;
-}
+window.onload = initPage;
